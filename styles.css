@@ -1,0 +1,514 @@
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=Share+Tech+Mono&display=swap');
+
+  :root {
+    --void: #050508;
+    --deep: #0a0a12;
+    --surface: #16161f;
+    --panel: #1c1c28;
+    --border: #2a2a40;
+    --dim: #3a3a55;
+    --ink: #8888aa;
+    --ghost: #aaaacc;
+    --pale: #ccccee;
+    --white: #e8e8f8;
+    --gold: #c8a84b;
+    --gold-dim: #7a6530;
+    --teal: #2dd4bf;
+    --teal-dim: #0d4a44;
+    --red: #e05555;
+    --red-dim: #5a1a1a;
+    --purple: #9b59b6;
+    --purple-dim: #3d1a5a;
+    --purple-bright: #c77dff;
+    --green: #27ae60;
+    --green-dim: #0d3d20;
+    --san-color: #7ec8e3;
+    --san-dim: #1a3d4a;
+    /* Awakening theme vars — overridden by .awakened on body */
+    --aw-bg: #0f0818;
+    --aw-border: #3d1a5a;
+    --aw-glow: rgba(155,89,182,0);
+  }
+
+  /* ===== AWAKENING BODY STATE ===== */
+  body.awakened {
+    --aw-bg: #110822;
+    --aw-border: #6b2fa0;
+    --aw-glow: rgba(155,89,182,0.18);
+  }
+  body.awakened #battle-screen {
+    background: radial-gradient(ellipse at 50% 30%, #1a0830 0%, #08030f 70%) !important;
+  }
+  body.awakened .battle-header { border-bottom: 1px solid #3d1a5a; }
+  body.awakened .hand-area { border-top: 1px solid #3d1a5a; padding-top: 0.5rem; }
+
+  /* Awakening flicker border */
+  body.awakened::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    border: 2px solid var(--purple-dim);
+    pointer-events: none;
+    z-index: 999;
+    animation: aw-flicker 3s ease-in-out infinite;
+  }
+  @keyframes aw-flicker {
+    0%,100% { opacity:0.2; box-shadow: inset 0 0 40px rgba(155,89,182,0.05); }
+    50% { opacity:0.8; box-shadow: inset 0 0 80px rgba(155,89,182,0.15); }
+  }
+
+  /* ===== AWAKENING POPUP ===== */
+  #awakening-popup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    background: rgba(5,0,15,0.88);
+    animation: aw-fade-in 0.4s ease;
+  }
+  #awakening-popup.visible { display: flex; }
+  @keyframes aw-fade-in { from { opacity:0; } to { opacity:1; } }
+
+  .aw-popup-box {
+    border: 1px solid var(--purple);
+    background: #0d0618;
+    padding: 3rem 2.5rem;
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: 0 0 80px rgba(155,89,182,0.3);
+    animation: aw-scale-in 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes aw-scale-in { from { transform:scale(0.8); opacity:0; } to { transform:scale(1); opacity:1; } }
+
+  .aw-eye {
+    font-size: 4rem;
+    animation: aw-eye-pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes aw-eye-pulse {
+    0%,100% { filter: drop-shadow(0 0 10px #9b59b6); transform: scale(1); }
+    50% { filter: drop-shadow(0 0 40px #c77dff); transform: scale(1.15); }
+  }
+
+  .aw-level-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--purple);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+  }
+
+  .aw-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--purple-bright);
+    letter-spacing: 0.15em;
+  }
+
+  .aw-desc {
+    font-style: italic;
+    color: var(--ghost);
+    line-height: 1.8;
+    font-size: 0.95rem;
+  }
+
+  .aw-effect {
+    background: rgba(155,89,182,0.1);
+    border: 1px solid var(--purple-dim);
+    padding: 0.8rem 1.2rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--purple-bright);
+    letter-spacing: 0.05em;
+    line-height: 1.6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--void);
+    color: var(--pale);
+    font-family: 'IM Fell English', serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 1s;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .screen { display: none; position: relative; z-index: 1; }
+  .screen.active { display: flex; }
+
+  /* ===== TITLE ===== */
+  #title-screen {
+    flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; text-align: center; padding: 2rem;
+    background: radial-gradient(ellipse at 50% 60%, #0d0d22 0%, var(--void) 70%);
+  }
+  .title-eye {
+    width: 120px; height: 120px; margin-bottom: 2rem;
+    animation: pulse-eye 4s ease-in-out infinite;
+  }
+  @keyframes pulse-eye {
+    0%,100% { filter: drop-shadow(0 0 20px #9b59b655); }
+    50% { filter: drop-shadow(0 0 50px #9b59b6aa) drop-shadow(0 0 80px #9b59b644); }
+  }
+  .game-title {
+    font-family: 'Cinzel', serif; font-size: clamp(2.5rem,8vw,5rem); font-weight: 900;
+    color: var(--white); letter-spacing: 0.15em; line-height: 1; margin-bottom: 0.4rem;
+  }
+  .game-subtitle {
+    font-family: 'IM Fell English', serif; font-style: italic;
+    font-size: clamp(0.9rem,2.5vw,1.2rem); color: var(--ink);
+    letter-spacing: 0.3em; margin-bottom: 3rem;
+  }
+  .title-flavor {
+    max-width: 460px; color: var(--dim); font-style: italic; font-size: 1rem;
+    line-height: 1.7; margin-bottom: 3rem; border-left: 2px solid var(--border);
+    padding-left: 1.2rem; text-align: left;
+  }
+
+  /* ===== CHARACTER SELECT ===== */
+  #select-screen {
+    flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 2rem 1rem;
+    background: radial-gradient(ellipse at 50% 30%, #0d0d22 0%, var(--void) 70%);
+  }
+  .select-inner { width: 100%; max-width: 1000px; display: flex; flex-direction: column; align-items: center; }
+  .select-title {
+    font-family: 'Cinzel', serif; font-size: 1.6rem; font-weight: 900; color: var(--white);
+    letter-spacing: 0.2em; text-align: center;
+  }
+  .select-sub { font-style: italic; color: var(--ink); margin: 0.5rem 0 2.5rem; text-align: center; }
+  .char-grid { display: flex; gap: 1.2rem; flex-wrap: wrap; justify-content: center; width: 100%; }
+  .char-card {
+    flex: 1; min-width: 260px; max-width: 310px;
+    border: 1px solid var(--border); background: var(--surface);
+    padding: 1.6rem 1.4rem; display: flex; flex-direction: column; gap: 0.9rem;
+    cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  .char-card::before {
+    content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s;
+    background: radial-gradient(circle at 50% 0%, var(--char-glow, rgba(200,168,75,0.08)) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .char-card:hover { transform: translateY(-6px); border-color: var(--char-accent, var(--gold)); }
+  .char-card:hover::before { opacity: 1; }
+  .char-icon { font-size: 3rem; text-align: center; line-height: 1; }
+  .char-name {
+    font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 700;
+    color: var(--char-accent, var(--white)); letter-spacing: 0.1em; text-align: center;
+  }
+  .char-epithet {
+    font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--ink);
+    letter-spacing: 0.25em; text-transform: uppercase; text-align: center; margin-top: -0.4rem;
+  }
+  .char-stats-row { display: flex; justify-content: center; gap: 1.2rem; }
+  .char-stat { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; }
+  .char-stat-val { font-family: 'Share Tech Mono', monospace; font-size: 1rem; }
+  .char-stat-val.hp { color: var(--red); }
+  .char-stat-val.san { color: var(--san-color); }
+  .char-stat-lbl { font-family: 'Share Tech Mono', monospace; font-size: 0.55rem; color: var(--ink); letter-spacing: 0.1em; }
+  .char-passive {
+    border: 1px solid var(--char-accent-dim, var(--border)); padding: 0.6rem 0.8rem;
+    background: rgba(255,255,255,0.02);
+  }
+  .char-passive-name {
+    font-family: 'Cinzel', serif; font-size: 0.72rem; color: var(--char-accent, var(--gold));
+    letter-spacing: 0.05em; margin-bottom: 0.3rem;
+  }
+  .char-passive-desc { font-style: italic; font-size: 0.74rem; color: var(--ghost); line-height: 1.5; }
+  .char-flavor { font-style: italic; font-size: 0.74rem; color: var(--dim); line-height: 1.55; text-align: center; }
+  .char-deck-hint { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--ink); text-align: center; letter-spacing: 0.05em; line-height: 1.6; }
+  .char-select-btn {
+    margin-top: auto; background: none; border: 1px solid var(--char-accent-dim, var(--gold-dim));
+    color: var(--char-accent, var(--gold)); font-family: 'Cinzel', serif; font-size: 0.75rem;
+    letter-spacing: 0.2em; padding: 0.7rem; cursor: pointer; transition: all 0.25s; width: 100%;
+  }
+  .char-card:hover .char-select-btn { background: var(--char-accent, var(--gold)); color: var(--void); }
+
+  .btn {
+    background: none; border: 1px solid var(--gold-dim); color: var(--gold);
+    font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 0.2em;
+    padding: 0.85rem 2.5rem; cursor: pointer; transition: all 0.3s;
+  }
+  .btn:hover { border-color: var(--gold); background: rgba(200,168,75,0.08); box-shadow: 0 0 20px rgba(200,168,75,0.2); }
+  .btn-danger { border-color: var(--red-dim); color: var(--red); }
+  .btn-danger:hover { border-color: var(--red); background: rgba(224,85,85,0.08); }
+  .btn-san { border-color: var(--san-dim); color: var(--san-color); }
+  .btn-san:hover { border-color: var(--san-color); background: rgba(126,200,227,0.08); }
+
+  /* ===== MAP ===== */
+  #map-screen {
+    flex-direction: column; min-height: 100vh; padding: 1.5rem; gap: 1.5rem;
+    background: radial-gradient(ellipse at 50% 0%, #0a0a1a 0%, var(--void) 60%);
+  }
+  .map-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  .map-title { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--ink); letter-spacing: 0.2em; }
+  .map-char-line { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; color: var(--dim); letter-spacing: 0.1em; margin-top: 0.3rem; }
+  .stats-bar { display: flex; gap: 2rem; flex-wrap: wrap; }
+  .stat { display: flex; flex-direction: column; gap: 0.3rem; min-width: 100px; }
+  .stat-label { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--ink); letter-spacing: 0.2em; text-transform: uppercase; }
+  .stat-bar-wrap { height: 6px; background: var(--border); overflow: hidden; }
+  .stat-bar-fill { height: 100%; transition: width 0.5s ease; }
+  .hp-fill { background: linear-gradient(90deg, #c0392b, #e05555); }
+  .san-fill { background: linear-gradient(90deg, #1a6a8a, var(--san-color)); transition: width 0.5s ease, background 1s; }
+  .san-fill.low { background: linear-gradient(90deg, #5a0a8a, #9b59b6); }
+  .san-fill.zero { background: linear-gradient(90deg, #3d1a5a, #c77dff); animation: san-zero-pulse 1s ease-in-out infinite; }
+  @keyframes san-zero-pulse { 0%,100%{opacity:0.6;} 50%{opacity:1;} }
+  .stat-value { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--ghost); }
+  .map-area { flex: 1; display: flex; flex-direction: column; gap: 1.5rem; }
+  .floor-label { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--dim); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+  .map-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .map-node {
+    width: 80px; height: 80px; border: 1px solid var(--border); background: var(--surface);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.3s; gap: 0.3rem;
+  }
+  .map-node:hover:not(.locked) { border-color: var(--gold-dim); background: var(--panel); transform: translateY(-2px); }
+  .map-node.locked { opacity: 0.3; cursor: not-allowed; }
+  .map-node.completed { border-color: var(--dim); opacity: 0.5; }
+  .map-node.available { border-color: var(--gold-dim); box-shadow: 0 0 12px rgba(200,168,75,0.1); }
+  .node-icon { font-size: 1.8rem; line-height: 1; }
+  .node-label { font-family: 'Share Tech Mono', monospace; font-size: 0.55rem; color: var(--ink); letter-spacing: 0.1em; text-align: center; }
+
+  /* Awakening indicator on map */
+  .awakening-banner {
+    display: none;
+    background: rgba(155,89,182,0.12);
+    border: 1px solid var(--purple-dim);
+    padding: 0.6rem 1.2rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--purple-bright);
+    letter-spacing: 0.15em;
+    text-align: center;
+  }
+  .awakening-banner.visible { display: block; }
+
+  /* ===== BATTLE ===== */
+  #battle-screen {
+    flex-direction: column; min-height: 100vh; padding: 1rem; gap: 0.8rem;
+    background: radial-gradient(ellipse at 50% 30%, #0f0818 0%, var(--void) 65%);
+    transition: background 1s;
+  }
+  .battle-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+
+  /* Awakening level indicator in battle */
+  #aw-level-badge {
+    display: none;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--purple-bright);
+    background: rgba(155,89,182,0.15);
+    border: 1px solid var(--purple-dim);
+    padding: 0.3rem 0.7rem;
+    letter-spacing: 0.15em;
+    animation: aw-flicker 2s ease-in-out infinite;
+    text-align: center;
+  }
+  #aw-level-badge.visible { display: block; }
+
+  .enemies-container {
+    flex: 1; display: flex; flex-direction: row; align-items: flex-start;
+    justify-content: center; gap: 0.8rem; padding: 0.5rem; flex-wrap: wrap;
+    min-width: 200px;
+  }
+  .enemy-card {
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    padding: 0.6rem 0.5rem; border: 1px solid transparent; cursor: pointer;
+    transition: all 0.25s; position: relative; min-width: 130px; max-width: 170px;
+  }
+  .enemy-card.targetable:hover {
+    border-color: var(--red); background: rgba(224,85,85,0.06);
+    box-shadow: 0 0 18px rgba(224,85,85,0.15);
+  }
+  .enemy-card.selected {
+    border-color: var(--red); background: rgba(224,85,85,0.08);
+    box-shadow: 0 0 22px rgba(224,85,85,0.25);
+  }
+  .enemy-card.dead { opacity: 0.25; filter: grayscale(1); pointer-events: none; }
+  .target-marker {
+    position: absolute; top: -0.6rem; left: 50%; transform: translateX(-50%);
+    font-size: 0.9rem; color: var(--red);
+    animation: target-bob 1s ease-in-out infinite;
+  }
+  @keyframes target-bob { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(3px);} }
+  .enemy-name { font-family: 'Cinzel', serif; font-size: 0.72rem; color: var(--ghost); letter-spacing: 0.1em; text-align: center; }
+  .enemy-sprite {
+    font-size: 3.4rem; line-height: 1;
+    filter: drop-shadow(0 0 16px rgba(155,89,182,0.4));
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+  .enemy-intent {
+    font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; color: var(--ink);
+    background: var(--panel); border: 1px solid var(--border); padding: 0.3rem 0.5rem; text-align: center;
+    white-space: nowrap;
+  }
+  .enemy-bars { width: 100%; display: flex; flex-direction: column; gap: 0.25rem; align-items: center; }
+  .enemy-bars .stat-bar-wrap { width: 100%; }
+  .enemy-shield-tag {
+    font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--teal);
+  }
+  .player-area { display: flex; flex-direction: column; gap: 0.5rem; min-width: 180px; }
+  .battle-mid { display: flex; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap; }
+  .shield-display { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+  .shield-val { font-family: 'Share Tech Mono', monospace; font-size: 1.8rem; color: var(--teal); }
+  .shield-label { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--ink); letter-spacing: 0.2em; }
+  .energy-display { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+  .energy-orbs { display: flex; gap: 0.4rem; }
+  .orb { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--gold-dim); background: var(--surface); transition: all 0.3s; }
+  .orb.filled { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 8px rgba(200,168,75,0.6); }
+  /* Awakened energy orbs */
+  body.awakened .orb.filled { background: var(--purple); border-color: var(--purple-bright); box-shadow: 0 0 8px rgba(199,125,255,0.6); }
+
+  .battle-log {
+    background: var(--surface); border: 1px solid var(--border); padding: 0.6rem 1rem;
+    font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--ink);
+    min-height: 3rem; line-height: 1.5; max-height: 80px; overflow-y: auto;
+  }
+  .log-entry { color: var(--ghost); }
+  .log-entry.damage { color: var(--red); }
+  .log-entry.heal { color: var(--green); }
+  .log-entry.san { color: var(--san-color); }
+  .log-entry.shield { color: var(--teal); }
+  .log-entry.special { color: var(--gold); }
+  .log-entry.awakened { color: var(--purple-bright); font-weight: bold; }
+
+  .hand-area { display: flex; flex-direction: column; gap: 0.8rem; }
+  .hand-controls { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .hand-label { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--ink); letter-spacing: 0.2em; }
+  .hand-cards {
+    display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center;
+    min-height: 140px; align-items: flex-end;
+  }
+  .deck-info { display: flex; gap: 1.5rem; font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--ink); letter-spacing: 0.1em; }
+
+  /* ===== CARDS ===== */
+  .card {
+    width: 100px; min-height: 130px; border: 1px solid var(--border); background: var(--panel);
+    display: flex; flex-direction: column; gap: 0.3rem; padding: 0.6rem;
+    cursor: pointer; transition: all 0.25s; position: relative; flex-shrink: 0;
+  }
+  .card:hover:not(.unplayable) { transform: translateY(-12px) scale(1.05); z-index: 10; }
+  .card.unplayable { opacity: 0.4; cursor: not-allowed; }
+
+  /* Normal card types */
+  .card.type-attack { border-color: var(--red-dim); background: linear-gradient(160deg, var(--panel), #1a0a0a); }
+  .card.type-attack:hover:not(.unplayable) { border-color: var(--red); box-shadow: 0 0 20px rgba(224,85,85,0.25); }
+  .card.type-rational { border-color: var(--teal-dim); background: linear-gradient(160deg, var(--panel), #0a1a1a); }
+  .card.type-rational:hover:not(.unplayable) { border-color: var(--teal); box-shadow: 0 0 20px rgba(45,212,191,0.25); }
+  .card.type-forbidden { border-color: var(--purple-dim); background: linear-gradient(160deg, var(--panel), #1a0f28); }
+  .card.type-forbidden:hover:not(.unplayable) { border-color: var(--purple); box-shadow: 0 0 20px rgba(155,89,182,0.3); }
+  .card.type-curse { border-color: var(--dim); background: linear-gradient(160deg, #0a0a0a, #111118); opacity: 0.6; cursor: not-allowed; }
+
+  /* ===== AWAKENED CARD VARIANTS ===== */
+  /* Awakened versions override normal types */
+  .card.awakened-card {
+    border-color: var(--purple) !important;
+    background: linear-gradient(160deg, #1a0830, #0d0520) !important;
+    box-shadow: 0 0 12px rgba(155,89,182,0.25), inset 0 0 20px rgba(155,89,182,0.05) !important;
+    animation: card-aw-pulse 2s ease-in-out infinite;
+  }
+  @keyframes card-aw-pulse {
+    0%,100% { box-shadow: 0 0 8px rgba(155,89,182,0.2), inset 0 0 15px rgba(155,89,182,0.03); }
+    50% { box-shadow: 0 0 25px rgba(199,125,255,0.4), inset 0 0 30px rgba(155,89,182,0.08); }
+  }
+  .card.awakened-card:hover:not(.unplayable) {
+    border-color: var(--purple-bright) !important;
+    box-shadow: 0 0 35px rgba(199,125,255,0.5) !important;
+    transform: translateY(-14px) scale(1.08) !important;
+  }
+  .card.awakened-card .card-name { color: var(--purple-bright) !important; }
+  .card.awakened-card .card-icon { filter: hue-rotate(250deg) saturate(2) brightness(1.3); }
+  /* Awakened tag */
+  .aw-tag {
+    position: absolute; bottom: 0.3rem; left: 0; right: 0;
+    font-family: 'Share Tech Mono', monospace; font-size: 0.5rem;
+    color: var(--purple-bright); letter-spacing: 0.15em; text-align: center;
+    text-transform: uppercase; opacity: 0.8;
+  }
+  /* HP cost indicator for awakened cards */
+  .card-hp-cost {
+    font-family: 'Share Tech Mono', monospace; font-size: 0.58rem;
+    color: var(--red); text-align: center;
+  }
+
+  .card-cost {
+    position: absolute; top: 0.4rem; right: 0.4rem; width: 20px; height: 20px;
+    border-radius: 50%; background: var(--gold-dim); border: 1px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--gold);
+  }
+  .awakened-card .card-cost { background: var(--purple-dim); border-color: var(--purple-bright); color: var(--purple-bright); }
+  .card-icon { font-size: 1.8rem; text-align: center; line-height: 1.2; }
+  .card-name { font-family: 'Cinzel', serif; font-size: 0.6rem; color: var(--ghost); letter-spacing: 0.05em; text-align: center; line-height: 1.2; }
+  .card-desc { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.6rem; color: var(--ink); text-align: center; line-height: 1.3; flex: 1; }
+  .card-san-cost { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--san-color); text-align: center; }
+
+  /* ===== EVENT ===== */
+  #event-screen { flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; background: radial-gradient(ellipse at 50% 40%, #0a0a18 0%, var(--void) 65%); }
+  .event-card { max-width: 500px; width: 100%; border: 1px solid var(--border); background: var(--surface); padding: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+  .event-icon { font-size: 3rem; text-align: center; }
+  .event-title { font-family: 'Cinzel', serif; font-size: 1.2rem; color: var(--white); letter-spacing: 0.1em; text-align: center; }
+  .event-text { font-style: italic; color: var(--ghost); line-height: 1.8; font-size: 0.95rem; border-left: 2px solid var(--border); padding-left: 1rem; }
+  .event-choices { display: flex; flex-direction: column; gap: 0.8rem; }
+  .event-choice { background: var(--panel); border: 1px solid var(--border); color: var(--ghost); font-family: 'IM Fell English', serif; font-size: 0.9rem; padding: 0.9rem 1.2rem; cursor: pointer; transition: all 0.25s; text-align: left; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+  .event-choice:hover { border-color: var(--gold-dim); background: rgba(200,168,75,0.05); color: var(--white); }
+  .choice-cost { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--ink); white-space: nowrap; }
+  .rune-divider { display: flex; align-items: center; gap: 1rem; color: var(--border); font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; }
+  .rune-divider::before,.rune-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* ===== REWARD ===== */
+  #reward-screen { flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; background: radial-gradient(ellipse at 50% 40%, #0d0a00 0%, var(--void) 65%); }
+  .reward-title { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; text-align: center; }
+  .reward-subtitle { font-style: italic; color: var(--ink); margin-bottom: 2rem; text-align: center; font-size: 0.9rem; }
+  .reward-cards { display: flex; gap: 1.2rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2rem; }
+  .reward-card-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; }
+
+  /* ===== END SCREENS ===== */
+  #gameover-screen,#win-screen { flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; text-align: center; gap: 1.5rem; }
+  #gameover-screen { background: radial-gradient(ellipse at 50% 50%, #1a0505 0%, var(--void) 65%); }
+  #win-screen { background: radial-gradient(ellipse at 50% 50%, #0a0a20 0%, var(--void) 65%); }
+  .end-icon { font-size: 5rem; }
+  .end-title { font-family: 'Cinzel', serif; font-size: clamp(1.8rem,6vw,3rem); font-weight: 900; letter-spacing: 0.15em; }
+  .end-title.death { color: var(--red); }
+  .end-title.madness { color: var(--purple-bright); }
+  .end-title.victory { color: var(--gold); }
+  .end-text { font-style: italic; color: var(--ink); max-width: 400px; line-height: 1.8; }
+
+  /* ===== STATUS ===== */
+  .status-row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .status-badge { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; padding: 0.2rem 0.5rem; border: 1px solid; letter-spacing: 0.1em; }
+  .status-weak { border-color: var(--red-dim); color: var(--red); background: rgba(224,85,85,0.08); }
+  .status-burn { border-color: #e07a55; color: #e07a55; background: rgba(224,122,85,0.08); }
+  .status-shield { border-color: var(--teal-dim); color: var(--teal); background: rgba(45,212,191,0.08); }
+  .status-strength { border-color: var(--gold-dim); color: var(--gold); background: rgba(200,168,75,0.08); }
+  .status-mad { border-color: var(--purple-dim); color: var(--purple); background: rgba(155,89,182,0.08); }
+  .status-fusion { border-color: var(--purple-bright); color: var(--purple-bright); background: rgba(199,125,255,0.15); animation: aw-flicker 1.5s infinite; }
+  .clarity-tag {
+    display: none; font-family: 'Share Tech Mono', monospace; font-size: 0.58rem;
+    color: var(--san-color); letter-spacing: 0.1em; margin-top: 0.2rem;
+    border: 1px solid var(--san-dim); padding: 0.15rem 0.4rem; align-self: flex-start;
+    background: rgba(126,200,227,0.06);
+  }
+  .clarity-tag.visible { display: inline-block; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--deep); }
+  ::-webkit-scrollbar-thumb { background: var(--dim); }

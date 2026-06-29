@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一个克苏鲁肉鸽卡牌游戏</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Awakening popup -->
+<div id="awakening-popup">
+  <div class="aw-popup-box">
+    <div class="aw-eye" id="aw-eye">👁</div>
+    <div class="aw-level-tag" id="aw-level-tag">觉醒 · 第一层</div>
+    <h2 class="aw-title" id="aw-title">妄想降临</h2>
+    <p class="aw-desc" id="aw-desc">理智的边界已然崩塌。那些令你痛苦的知识，如今成为了你的武器。</p>
+    <div class="aw-effect" id="aw-effect">所有禁忌卡牌不再消耗理智<br>改为消耗少量HP，威力增强</div>
+    <button class="btn" style="border-color:var(--purple-dim);color:var(--purple-bright)" onclick="closeAwakeningPopup()">接受命运</button>
+  </div>
+</div>
+
+<!-- TITLE -->
+<div class="screen active" id="title-screen">
+  <svg class="title-eye" viewBox="0 0 120 120" fill="none">
+    <ellipse cx="60" cy="60" rx="55" ry="30" stroke="#2a2a40" stroke-width="1"/>
+    <circle cx="60" cy="60" r="22" fill="#0a0a12" stroke="#3d1a5a" stroke-width="1"/>
+    <circle cx="60" cy="60" r="14" fill="#9b59b6" opacity="0.8"/>
+    <circle cx="60" cy="60" r="8" fill="#0a0a12"/>
+    <circle cx="56" cy="56" r="3" fill="#ccccee" opacity="0.6"/>
+    <line x1="5" y1="60" x2="25" y2="60" stroke="#2a2a40" stroke-width="0.5"/>
+    <line x1="95" y1="60" x2="115" y2="60" stroke="#2a2a40" stroke-width="0.5"/>
+  </svg>
+  <h1 class="game-title">一个克苏鲁肉鸽卡牌游戏</h1>
+  <p class="title-flavor">"在宇宙洪荒的黑暗角落，有些知识不该被人类触碰。<br>然而你已踏入此地。塔在等待。古神在看着你。"</p>
+  <button class="btn" onclick="showCharacterSelect()">踏入深渊</button>
+  <button class="btn" id="continue-btn" style="display:none;margin-top:1rem" onclick="continueGame()">继续游戏</button>
+  <button id="mute-btn" onclick="toggleAudioBtn()" title="音效开关"
+    style="position:fixed;top:1rem;right:1rem;background:none;border:1px solid var(--border);color:var(--ghost);font-size:1.1rem;width:2.4rem;height:2.4rem;cursor:pointer;z-index:200">🔊</button>
+</div>
+
+<!-- CHARACTER SELECT -->
+<div class="screen" id="select-screen">
+  <div class="select-inner">
+    <h2 class="select-title">选择你的化身</h2>
+    <p class="select-sub">每位探索者都以不同的方式面对深渊</p>
+    <div class="char-grid" id="char-grid"></div>
+  </div>
+</div>
+
+<!-- MAP -->
+<div class="screen" id="map-screen">
+  <div class="map-header">
+    <div>
+      <p class="map-title">深渊之塔 — 第 <span id="map-floor">1</span> 层</p>
+      <p class="map-char-line" id="map-char-line"></p>
+    </div>
+    <div class="stats-bar">
+      <div class="stat">
+        <span class="stat-label">生命</span>
+        <div class="stat-bar-wrap"><div class="stat-bar-fill hp-fill" id="map-hp-bar" style="width:100%"></div></div>
+        <span class="stat-value" id="map-hp-val">70/70</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">理智</span>
+        <div class="stat-bar-wrap"><div class="stat-bar-fill san-fill" id="map-san-bar" style="width:100%"></div></div>
+        <span class="stat-value" id="map-san-val">100/100</span>
+      </div>
+    </div>
+    <button class="btn btn-san" onclick="showDeck()">牌组 (<span id="deck-count">0</span>)</button>
+  </div>
+  <div class="awakening-banner" id="map-aw-banner"></div>
+  <div class="map-area" id="map-nodes"></div>
+</div>
+
+<!-- BATTLE -->
+<div class="screen" id="battle-screen">
+  <div id="aw-level-badge">👁 觉醒中</div>
+  <div class="battle-header">
+    <div class="enemies-container" id="enemies-container"></div>
+    <div class="player-area">
+      <p class="stat-label">探索者</p>
+      <div class="stat">
+        <span class="stat-label">生命</span>
+        <div class="stat-bar-wrap"><div class="stat-bar-fill hp-fill" id="battle-hp-bar" style="width:100%"></div></div>
+        <span class="stat-value" id="battle-hp-val">70/70</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">理智</span>
+        <div class="stat-bar-wrap"><div class="stat-bar-fill san-fill" id="battle-san-bar" style="width:100%"></div></div>
+        <span class="stat-value" id="battle-san-val">100/100</span>
+        <span class="clarity-tag" id="clarity-tag"></span>
+      </div>
+      <div class="status-row" id="player-status-row" style="margin-top:0.4rem"></div>
+    </div>
+  </div>
+
+  <div class="battle-mid">
+    <div class="shield-display">
+      <span class="shield-val" id="battle-shield">0</span>
+      <span class="shield-label">🛡 护盾</span>
+    </div>
+    <div class="energy-display">
+      <div class="energy-orbs" id="energy-orbs"></div>
+      <span class="shield-label">⚡ 能量</span>
+    </div>
+  </div>
+
+  <div class="battle-log" id="battle-log"><div class="log-entry">战斗开始...</div></div>
+
+  <div class="hand-area">
+    <div class="hand-controls">
+      <span class="hand-label">手牌</span>
+      <div class="deck-info">
+        <span>牌堆: <span id="draw-count">0</span></span>
+        <span>弃牌: <span id="discard-count">0</span></span>
+      </div>
+      <button class="btn" id="end-turn-btn" onclick="endTurn()">结束回合</button>
+    </div>
+    <div class="hand-cards" id="hand-cards"></div>
+  </div>
+</div>
+
+<!-- EVENT -->
+<div class="screen" id="event-screen">
+  <div class="event-card">
+    <div class="event-icon" id="event-icon">📖</div>
+    <h2 class="event-title" id="event-title">神秘事件</h2>
+    <div class="rune-divider">ᚱ</div>
+    <p class="event-text" id="event-text">事件描述</p>
+    <div class="event-choices" id="event-choices"></div>
+  </div>
+</div>
+
+<!-- REWARD -->
+<div class="screen" id="reward-screen">
+  <h2 class="reward-title">战利品</h2>
+  <p class="reward-subtitle" id="reward-subtitle">选择一张卡牌加入你的牌组</p>
+  <div class="reward-cards" id="reward-cards"></div>
+  <button class="btn" onclick="skipReward()">跳过奖励</button>
+</div>
+
+<!-- GAME OVER -->
+<div class="screen" id="gameover-screen">
+  <div class="end-icon" id="end-icon">💀</div>
+  <h2 class="end-title" id="end-title-text">消亡</h2>
+  <p class="end-text" id="end-text">黑暗将你吞噬。</p>
+  <button class="btn btn-danger" onclick="startGame()">再次踏入</button>
+</div>
+
+<!-- WIN -->
+<div class="screen" id="win-screen">
+  <div class="end-icon">🌌</div>
+  <h2 class="end-title victory">你已抵达塔顶</h2>
+  <p class="end-text" id="win-text">古神低语着你的名字。</p>
+  <button class="btn" onclick="startGame()">新的轮回</button>
+</div>
+
+
+<!-- Howler.js (音频引擎). 若无网络/未使用音频可删除此行，游戏仍正常运行。 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+
+<!-- 游戏模块，按依赖顺序加载 -->
+<script src="js/data.js"></script>
+<script src="js/game.js"></script>
+<script src="js/save.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
